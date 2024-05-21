@@ -43,8 +43,8 @@ namespace ContaCorrente
             if (verificarSaldo(valor))
             {
                 this.saldo -= valor;
-                insereExtrato(valor, debito);
-                Console.WriteLine("Saldo atual: R$", getSaldo());
+                insereHistorico(valor, debito);
+                Console.WriteLine("Saldo atual: R$" + getSaldo());
             } else
             {
                 Console.WriteLine("Não é possível sacar mais que o limite disponível! ");
@@ -54,32 +54,37 @@ namespace ContaCorrente
         public void depositar(float valor)
         {
             this.saldo += valor;
-            insereExtrato(valor, credito);
-            Console.WriteLine("Saldo atual: R$", getSaldo());
+            insereHistorico(valor, credito);
+            Console.WriteLine("Saldo atual: R$" + getSaldo());
         }
 
         public float getSaldo()
         {
             return this.saldo;
         }
-       
-        public bool verificarSaldo(float valor)
+
+        private bool verificarSaldo(float valor)
         {
-            return valor < getSaldo() + limite ? true : false;
+            return valor <= getSaldo() + limite ? true : false;
         }
 
         public ArrayList getExtrato()
         {
             return null;
         }
+        public void receberTransf(float valor)
+        {
+            this.saldo += valor;
+            insereHistorico(valor, credito);
+        }
 
         public void transferirDinheiro(ContaCorrente contaDestino, float valor)
         {
             if (verificarSaldo(valor))
             {
-                contaDestino.saldo += valor;
                 this.saldo -= valor;
-                insereExtrato(valor, debito);
+                insereHistorico(valor, debito);
+                contaDestino.receberTransf(valor);
                 Console.WriteLine("Valor transferido com sucesso! ");
             } else
             {
@@ -87,7 +92,9 @@ namespace ContaCorrente
             }
         }
 
-        public void insereExtrato(float valor, string tipo)
+
+
+        private void insereHistorico(float valor, string tipo)
         {
             historico[0].Add(Convert.ToString(valor));
             historico[1].Add(tipo);
@@ -95,10 +102,11 @@ namespace ContaCorrente
 
         public void imprimirExtrato()
         {
+            Console.WriteLine($"Extrato do {titular.nome} conta numero: {numConta}");
             Console.WriteLine("Valor | Tipo");
             for (int i = 0; i < historico[0].Count(); i++)
             {
-                Console.Write(historico[0][i] + " | " + historico[1][i]);
+                Console.WriteLine(historico[0][i] + " | " + historico[1][i]);
             }
         }
 
